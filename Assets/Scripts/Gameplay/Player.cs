@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D mainRB;
     private float groundCheckDistance;
     private int groundCheckLayerMask;
+    private Vector3 groundCheckRCOffset;
     public bool grounded = true;
     private bool controlEnabled = true;
 
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour
         mainRB = GetComponent<Rigidbody2D>();
         groundCheckDistance = (GetComponent<BoxCollider2D>().bounds.size.y / 2) + .1f;
         groundCheckLayerMask = ~(LayerMask.GetMask("Player"));
+        groundCheckRCOffset = new Vector2(GetComponent<BoxCollider2D>().bounds.size.x / 2, 0);
     }
 
     void FixedUpdate()
@@ -45,7 +47,9 @@ public class Player : MonoBehaviour
         {
             mainRB.velocity = new Vector2(mainRB.velocity.x, mainRB.velocity.y * .5f);
         }
-        if (Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null)
+        if (
+            Physics2D.Raycast(transform.position + groundCheckRCOffset, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null
+            || Physics2D.Raycast(transform.position - groundCheckRCOffset, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null)
         {
             grounded = true;
         } else
