@@ -8,23 +8,22 @@ public class Player : MonoBehaviour
 {
 
     public int speed;
-    public bool canJump = true;
-    private Rigidbody2D rb;
     public float jumpForce;
     public int groundLayerNumber;
     public Image deathPanel;
-    private bool controlEnabled = true;
     public GameObject spawnPoint;
+
+    private Rigidbody2D mainRB;
+    private float groundCheckDistance;
+    private int groundCheckLayerMask;
+    public bool grounded = true;
+    private bool controlEnabled = true;
 
     void Start()
     {
-        Keyboard.current.onTextInput += OnTextInput;
-        rb = GetComponent<Rigidbody2D>();
-    }
-
-    private void OnDisable()
-    {
-        Keyboard.current.onTextInput -= OnTextInput;
+        mainRB = GetComponent<Rigidbody2D>();
+        groundCheckDistance = (GetComponent<BoxCollider2D>().bounds.size.y / 2) + .1f;
+        groundCheckLayerMask = ~(LayerMask.GetMask("Player"));
     }
 
     void FixedUpdate()
@@ -38,18 +37,23 @@ public class Player : MonoBehaviour
         {
             transform.position = new Vector2(transform.position.x - speed * Time.deltaTime, transform.position.y);
         }
+        if (Keyboard.current.spaceKey.isPressed && grounded)
+        {
+            mainRB.velocity = new Vector2(mainRB.velocity.x, jumpForce);
+        }
+        if (!Keyboard.current.spaceKey.isPressed && mainRB.velocity.y > 0)
+        {
+            mainRB.velocity = new Vector2(mainRB.velocity.x, mainRB.velocity.y * .5f);
+        }
+        if (Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null)
+        {
+            grounded = true;
+        } else
+        {
+            grounded = false;
+        }
     }
 
-    private void OnTextInput(char ch)
-    {
-        if (ch == ' ' && canJump && controlEnabled)
-        {
-            Debug.Log("iia true");
-            rb.AddForce(new Vector2(0f, jumpForce));
-            canJump = false;
-        }
-        Debug.Log(ch);
-    }
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //Death check
