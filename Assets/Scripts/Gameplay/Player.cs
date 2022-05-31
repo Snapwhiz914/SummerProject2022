@@ -19,6 +19,8 @@ public class Player : MonoBehaviour
     private Vector3 groundCheckRCOffset;
     public bool grounded = true;
     private bool controlEnabled = true;
+    public bool doubleJumpEnabled;
+    private bool canJumpAgain;
 
     void Start()
     {
@@ -39,14 +41,29 @@ public class Player : MonoBehaviour
         {
             transform.position = new Vector2(transform.position.x - speed * Time.deltaTime, transform.position.y);
         }
-        if (Keyboard.current.spaceKey.isPressed && grounded)
+
+        if (Keyboard.current.spaceKey.isPressed)
         {
-            mainRB.velocity = new Vector2(mainRB.velocity.x, jumpForce);
+            if (!doubleJumpEnabled && grounded) mainRB.velocity = new Vector2(mainRB.velocity.x, jumpForce);
+            if (doubleJumpEnabled && mainRB.velocity.y <= 0)
+            {
+                if (grounded)
+                {
+                    mainRB.velocity = new Vector2(mainRB.velocity.x, jumpForce);
+                    canJumpAgain = true;
+                }
+                else if (canJumpAgain)
+                {
+                    mainRB.velocity = new Vector2(mainRB.velocity.x, jumpForce);
+                    canJumpAgain = false;
+                }
+            }
         }
         if (!Keyboard.current.spaceKey.isPressed && mainRB.velocity.y > 0)
         {
             mainRB.velocity = new Vector2(mainRB.velocity.x, mainRB.velocity.y * .5f);
         }
+
         if (
             Physics2D.Raycast(transform.position + groundCheckRCOffset, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null
             || Physics2D.Raycast(transform.position - groundCheckRCOffset, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null)
