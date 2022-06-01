@@ -80,6 +80,16 @@ public class Player : MonoBehaviour
         {
             grounded = false;
         }
+
+        if (Keyboard.current.leftShiftKey.isPressed)
+        {
+
+        }
+    }
+
+    void roll()
+    {
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
