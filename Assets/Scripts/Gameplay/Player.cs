@@ -22,6 +22,7 @@ public class Player : MonoBehaviour
     public bool doubleJumpEnabled;
     private bool canJumpAgain;
     private bool spaceKeyDebounce;
+    private bool isDying;
 
     void Start()
     {
@@ -95,7 +96,7 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //Death check
-        if (collision.gameObject.CompareTag("Killer"))
+        if (collision.gameObject.CompareTag("Killer") && !isDying)
         {
             StartCoroutine(die(collision));
         }
@@ -104,6 +105,7 @@ public class Player : MonoBehaviour
     private IEnumerator die(Collision2D collision)
     {
         controlEnabled = false;
+        isDying = true;
         for (int i = 0; i < 100; i++)
         {
             deathPanel.color = new Color(0, 0, 0, i*.01f);
@@ -115,6 +117,7 @@ public class Player : MonoBehaviour
             deathPanel.color = new Color(0, 0, 0, i*.01f);
             yield return new WaitForSeconds(0.01f);
         }
+        isDying = false;
         controlEnabled = true;
     }
 }
