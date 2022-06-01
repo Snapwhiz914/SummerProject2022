@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     private bool controlEnabled = true;
     public bool doubleJumpEnabled;
     private bool canJumpAgain;
+    private bool spaceKeyDebounce;
 
     void Start()
     {
@@ -51,13 +52,19 @@ public class Player : MonoBehaviour
                 {
                     mainRB.velocity = new Vector2(mainRB.velocity.x, jumpForce);
                     canJumpAgain = true;
+                    spaceKeyDebounce = false;
                 }
-                else if (canJumpAgain)
+                else if (canJumpAgain && spaceKeyDebounce)
                 {
                     mainRB.velocity = new Vector2(mainRB.velocity.x, jumpForce);
                     canJumpAgain = false;
+                    spaceKeyDebounce = false;
                 }
             }
+        }
+        if (!Keyboard.current.spaceKey.isPressed && !spaceKeyDebounce)
+        {
+            spaceKeyDebounce = true;
         }
         if (!Keyboard.current.spaceKey.isPressed && mainRB.velocity.y > 0)
         {
