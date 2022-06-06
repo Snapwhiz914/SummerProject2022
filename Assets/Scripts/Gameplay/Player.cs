@@ -12,22 +12,24 @@ public class Player : MonoBehaviour
     public int groundLayerNumber;
     public Image deathPanel;
     public GameObject spawnPoint;
+    public bool doubleJumpEnabled;
+    public float movementSmothing;
 
     private Rigidbody2D mainRB;
     private float groundCheckDistance;
     private int groundCheckLayerMask;
     private Vector3 groundCheckRCOffset;
-    public bool grounded = true;
+    private bool grounded = true;
     private bool controlEnabled = true;
-    public bool doubleJumpEnabled;
     private bool canJumpAgain;
     private bool spaceKeyDebounce;
     private bool isDying;
+    private Vector3 velocity = Vector3.zero;
 
     void Start()
     {
         mainRB = GetComponent<Rigidbody2D>();
-        groundCheckDistance = (GetComponent<BoxCollider2D>().bounds.size.y / 2) + .1f;
+        groundCheckDistance = (GetComponent<BoxCollider2D>().bounds.size.y / 2) + .05f;
         groundCheckLayerMask = ~(LayerMask.GetMask("Player"));
         groundCheckRCOffset = new Vector2(GetComponent<BoxCollider2D>().bounds.size.x / 2, 0);
     }
@@ -37,11 +39,19 @@ public class Player : MonoBehaviour
         if (!controlEnabled) return;
         if (Keyboard.current.dKey.isPressed)
         {
-            transform.position = new Vector2(transform.position.x + speed * Time.deltaTime, transform.position.y);
+            mainRB.MovePosition(new Vector2(transform.position.x + speed * Time.deltaTime, transform.position.y));
+            //transform.position = new Vector2(transform.position.x + speed * Time.deltaTime, transform.position.y);
+            //mainRB.AddForce(new Vector2(speed * Time.deltaTime, transform.position.y));
+            //mainRB.velocity = new Vector2(speed * Time.deltaTime, mainRB.velocity.y);
+            //moveInDirection(speed * Time.deltaTime);
         }
         if (Keyboard.current.aKey.isPressed)
         {
-            transform.position = new Vector2(transform.position.x - speed * Time.deltaTime, transform.position.y);
+            mainRB.MovePosition(new Vector2(transform.position.x - speed * Time.deltaTime, transform.position.y));
+            //transform.position = new Vector2(transform.position.x - speed * Time.deltaTime, transform.position.y);
+            //mainRB.AddForce(new Vector2(-speed * Time.deltaTime, transform.position.y));
+            //mainRB.velocity = new Vector2(-speed * Time.deltaTime, mainRB.velocity.y);
+            //moveInDirection(-speed * Time.deltaTime);
         }
 
         if (Keyboard.current.spaceKey.isPressed)
@@ -81,16 +91,6 @@ public class Player : MonoBehaviour
         {
             grounded = false;
         }
-
-        if (Keyboard.current.leftShiftKey.isPressed)
-        {
-
-        }
-    }
-
-    void roll()
-    {
-
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
