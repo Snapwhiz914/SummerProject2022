@@ -2939,13 +2939,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf3587427bf42c64c8231d6adda2f0d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 215
   jumpForce: 7.45
   groundLayerNumber: 3
   deathPanel: {fileID: 2049043258}
   spawnPoint: {fileID: 1472861421}
   doubleJumpEnabled: 0
   movementSmothing: 0.05
+  grounded: 1
 --- !u!50 &1891985841
 Rigidbody2D:
   serializedVersion: 4
@@ -2976,7 +2977,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 1891985835}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: e208fc5a8feccb5439c0cd29c5e6b118, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0

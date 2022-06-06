@@ -55,6 +55,9 @@ ExportedObj/
 # Unity3D generated file on crash reports
 sysinfo.txt
 
+#editor discord RPC util file
+.erp
+
 # Builds
 *.apk
 *.unitypackage

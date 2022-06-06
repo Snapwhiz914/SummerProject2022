@@ -19,12 +19,12 @@ public class Player : MonoBehaviour
     private float groundCheckDistance;
     private int groundCheckLayerMask;
     private Vector3 groundCheckRCOffset;
-    private bool grounded = true;
+    private Vector3 sideCheckRCOffset;
+    public bool grounded = true;
     private bool controlEnabled = true;
     private bool canJumpAgain;
     private bool spaceKeyDebounce;
     private bool isDying;
-    private Vector3 velocity = Vector3.zero;
 
     void Start()
     {
@@ -32,28 +32,24 @@ public class Player : MonoBehaviour
         groundCheckDistance = (GetComponent<BoxCollider2D>().bounds.size.y / 2) + .05f;
         groundCheckLayerMask = ~(LayerMask.GetMask("Player"));
         groundCheckRCOffset = new Vector2(GetComponent<BoxCollider2D>().bounds.size.x / 2, 0);
+        sideCheckRCOffset = new Vector2(0, GetComponent<BoxCollider2D>().bounds.size.y / 2);
     }
 
     void FixedUpdate()
     {
         if (!controlEnabled) return;
-        if (Keyboard.current.dKey.isPressed)
+        if (Keyboard.current.dKey.isPressed && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.right, groundCheckDistance, groundCheckLayerMask).collider == null)
         {
-            mainRB.MovePosition(new Vector2(transform.position.x + speed * Time.deltaTime, transform.position.y));
-            //transform.position = new Vector2(transform.position.x + speed * Time.deltaTime, transform.position.y);
-            //mainRB.AddForce(new Vector2(speed * Time.deltaTime, transform.position.y));
-            //mainRB.velocity = new Vector2(speed * Time.deltaTime, mainRB.velocity.y);
-            //moveInDirection(speed * Time.deltaTime);
+            mainRB.velocity = new Vector2(speed * Time.deltaTime, mainRB.velocity.y);
         }
-        if (Keyboard.current.aKey.isPressed)
+        if (Keyboard.current.aKey.isPressed && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.left, groundCheckDistance, groundCheckLayerMask).collider == null)
         {
-            mainRB.MovePosition(new Vector2(transform.position.x - speed * Time.deltaTime, transform.position.y));
-            //transform.position = new Vector2(transform.position.x - speed * Time.deltaTime, transform.position.y);
-            //mainRB.AddForce(new Vector2(-speed * Time.deltaTime, transform.position.y));
-            //mainRB.velocity = new Vector2(-speed * Time.deltaTime, mainRB.velocity.y);
-            //moveInDirection(-speed * Time.deltaTime);
+            mainRB.velocity = new Vector2(-speed * Time.deltaTime, mainRB.velocity.y);
         }
-
+        if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed)
+        {
+            mainRB.velocity = new Vector2(0, mainRB.velocity.y);
+        }
         if (Keyboard.current.spaceKey.isPressed)
         {
             if (!doubleJumpEnabled && grounded) mainRB.velocity = new Vector2(mainRB.velocity.x, jumpForce);
