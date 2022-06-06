@@ -101,6 +101,7 @@ public class Player : MonoBehaviour
     private IEnumerator die(Collision2D collision)
     {
         controlEnabled = false;
+        mainRB.velocity = Vector2.zero;
         isDying = true;
         for (int i = 0; i < 100; i++)
         {
