@@ -13,18 +13,20 @@ public class Player : MonoBehaviour
     public Image deathPanel;
     public GameObject spawnPoint;
     public bool doubleJumpEnabled;
-    public float movementSmothing;
+    [Range(0f, Mathf.Infinity)]
+    public float airControlFactor;
 
     private Rigidbody2D mainRB;
     private float groundCheckDistance;
     private int groundCheckLayerMask;
     private Vector3 groundCheckRCOffset;
     private Vector3 sideCheckRCOffset;
-    public bool grounded = true;
+    private bool grounded = true;
     private bool controlEnabled = true;
     private bool canJumpAgain;
     private bool spaceKeyDebounce;
     private bool isDying;
+    private float newSpeed = 0;
 
     void Start()
     {
@@ -38,13 +40,14 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         if (!controlEnabled) return;
+        if (!grounded) newSpeed = speed - airControlFactor; else newSpeed = speed;
         if (Keyboard.current.dKey.isPressed && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.right, groundCheckDistance, groundCheckLayerMask).collider == null)
         {
-            mainRB.velocity = new Vector2(speed * Time.deltaTime, mainRB.velocity.y);
+            mainRB.velocity = new Vector2(newSpeed * Time.deltaTime, mainRB.velocity.y);
         }
         if (Keyboard.current.aKey.isPressed && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.left, groundCheckDistance, groundCheckLayerMask).collider == null)
         {
-            mainRB.velocity = new Vector2(-speed * Time.deltaTime, mainRB.velocity.y);
+            mainRB.velocity = new Vector2(-newSpeed * Time.deltaTime, mainRB.velocity.y);
         }
         if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed)
         {
@@ -77,7 +80,6 @@ public class Player : MonoBehaviour
         {
             mainRB.velocity = new Vector2(mainRB.velocity.x, mainRB.velocity.y * .5f);
         }
-
         if (
             Physics2D.Raycast(transform.position + groundCheckRCOffset, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null
             || Physics2D.Raycast(transform.position - groundCheckRCOffset, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null)
