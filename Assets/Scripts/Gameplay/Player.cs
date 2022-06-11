@@ -26,7 +26,11 @@ public class Player : MonoBehaviour
     private bool canJumpAgain;
     private bool spaceKeyDebounce;
     private bool isDying;
-    private float newSpeed = 0;
+
+    private bool isDragging = false;
+    private Vector2 startDragPos;
+    private GameObject currentThrowable;
+    public GameObject throwable;
 
     void Start()
     {
@@ -40,14 +44,13 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         if (!controlEnabled) return;
-        if (!grounded) newSpeed = speed - airControlFactor; else newSpeed = speed;
         if (Keyboard.current.dKey.isPressed && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.right, groundCheckDistance, groundCheckLayerMask).collider == null)
         {
-            mainRB.velocity = new Vector2(newSpeed * Time.deltaTime, mainRB.velocity.y);
+            mainRB.velocity = new Vector2(speed * Time.deltaTime, mainRB.velocity.y);
         }
         if (Keyboard.current.aKey.isPressed && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.left, groundCheckDistance, groundCheckLayerMask).collider == null)
         {
-            mainRB.velocity = new Vector2(-newSpeed * Time.deltaTime, mainRB.velocity.y);
+            mainRB.velocity = new Vector2(-speed * Time.deltaTime, mainRB.velocity.y);
         }
         if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed)
         {
@@ -88,6 +91,30 @@ public class Player : MonoBehaviour
         } else
         {
             grounded = false;
+        }
+
+        if (Mouse.current.leftButton.isPressed && !isDragging)
+        {
+            //Mouse is down for the first time (OnMouseDown)
+            isDragging = true;
+            Mouse.current.WarpCursorPosition(Camera.main.WorldToScreenPoint(transform.position));
+            startDragPos = transform.position;
+            //currentThrowable = Instantiate(throwable, transform.position, transform.rotation);
+        }
+        //if (Mouse.current.leftButton.isPressed && isDragging)
+        //{
+            //Called when mouse is dragging (OnMouseDrag)
+        //}
+        if (!Mouse.current.leftButton.isPressed && isDragging)
+        {
+            //Called when mouse is released (OnMouseUp)
+            isDragging = false;
+            Vector2 dragEndPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            Vector2 velocity = (dragEndPos - startDragPos)*2;
+            currentThrowable = Instantiate(throwable, transform.position, transform.rotation);
+            currentThrowable.GetComponent<Rigidbody2D>().velocity = -velocity;
+            currentThrowable.GetComponent<ThrowableManager>().setThrower(this);
+            Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), currentThrowable.GetComponent<BoxCollider2D>(), true);
         }
     }
 
