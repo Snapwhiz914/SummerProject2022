@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 3580410129688810440}
   - component: {fileID: 3580410129688810443}
   - component: {fileID: 3580410129688810442}
-  - component: {fileID: -2387989855189194605}
+  - component: {fileID: 1885098420668209660}
   m_Layer: 0
   m_Name: Throwable
-  m_TagString: Untagged
+  m_TagString: BouncePad
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -134,7 +134,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
---- !u!114 &-2387989855189194605
+--- !u!114 &1885098420668209660
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

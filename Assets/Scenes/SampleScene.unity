@@ -3293,7 +3293,7 @@ MonoBehaviour:
   deathPanel: {fileID: 2049043258}
   spawnPoint: {fileID: 1472861421}
   doubleJumpEnabled: 0
-  airControlFactor: 0.0001
+  airControlFactor: 0.000001
   throwable: {fileID: 3580410129688810437, guid: 05285674b393d254cb604ef2641db123, type: 3}
 --- !u!50 &1891985841
 Rigidbody2D:

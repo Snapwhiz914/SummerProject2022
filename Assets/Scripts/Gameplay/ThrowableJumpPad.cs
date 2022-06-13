@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ThrowableManager : MonoBehaviour
+public class ThrowableJumpPad : MonoBehaviour
 {
     private Player thrower;
     private float distanceToMoveIfRotated;

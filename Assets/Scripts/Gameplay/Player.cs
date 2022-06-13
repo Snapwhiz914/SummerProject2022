@@ -26,6 +26,7 @@ public class Player : MonoBehaviour
     private bool canJumpAgain;
     private bool spaceKeyDebounce;
     private bool isDying;
+    private bool didLandOnBouncePad;
 
     private bool isDragging = false;
     private Vector2 startDragPos;
@@ -79,7 +80,7 @@ public class Player : MonoBehaviour
         {
             spaceKeyDebounce = true;
         }
-        if (!Keyboard.current.spaceKey.isPressed && mainRB.velocity.y > 0)
+        if (!Keyboard.current.spaceKey.isPressed && mainRB.velocity.y > 0 && !didLandOnBouncePad)
         {
             mainRB.velocity = new Vector2(mainRB.velocity.x, mainRB.velocity.y * .5f);
         }
@@ -87,7 +88,7 @@ public class Player : MonoBehaviour
             Physics2D.Raycast(transform.position + groundCheckRCOffset, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null
             || Physics2D.Raycast(transform.position - groundCheckRCOffset, Vector2.down, groundCheckDistance, groundCheckLayerMask).collider != null)
         {
-            grounded = true;
+            grounded = !didLandOnBouncePad; //If true, then grounded will be false, so player will not be able to jump whil launched by a bounce pad.
         } else
         {
             grounded = false;
@@ -113,7 +114,7 @@ public class Player : MonoBehaviour
             Vector2 velocity = (dragEndPos - startDragPos)*2;
             currentThrowable = Instantiate(throwable, transform.position, transform.rotation);
             currentThrowable.GetComponent<Rigidbody2D>().velocity = -velocity;
-            currentThrowable.GetComponent<ThrowableManager>().setThrower(this);
+            currentThrowable.GetComponent<ThrowableJumpPad>().setThrower(this);
             Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), currentThrowable.GetComponent<BoxCollider2D>(), true);
         }
     }
@@ -124,6 +125,15 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Killer") && !isDying)
         {
             StartCoroutine(die(collision));
+        }
+
+        //Jump pad interaction
+        if (collision.gameObject.CompareTag("BouncePad"))
+        {
+            didLandOnBouncePad = true;
+        } else
+        {
+            didLandOnBouncePad = false;
         }
     }
 
