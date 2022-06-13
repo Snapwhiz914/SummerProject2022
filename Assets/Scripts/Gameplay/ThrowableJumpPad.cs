@@ -52,6 +52,12 @@ public class ThrowableJumpPad : MonoBehaviour
             }
 
             GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+
+            if (isApproximately(angle, 180, 1f) || isApproximately(angle, 0, 1f))
+            {
+                transform.rotation = Quaternion.Euler(0, 0, 0); //Prevents from wierd rotated edge cases
+            }
+
             Physics2D.IgnoreCollision(thrower.GetComponent<BoxCollider2D>(), GetComponent<BoxCollider2D>(), false);
 
             hasLanded = true;

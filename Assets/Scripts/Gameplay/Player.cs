@@ -30,9 +30,10 @@ public class Player : MonoBehaviour
     private bool didLandOnRotatedBouncePad;
 
     private bool isDragging = false;
-    private Vector2 startDragPos;
     private GameObject currentThrowable;
+    Vector3 currentPos;
     public GameObject throwable;
+    private LineRenderer lr;
 
     void Start()
     {
@@ -41,6 +42,7 @@ public class Player : MonoBehaviour
         groundCheckLayerMask = ~(LayerMask.GetMask("Player"));
         groundCheckRCOffset = new Vector2(GetComponent<BoxCollider2D>().bounds.size.x / 2, 0);
         sideCheckRCOffset = new Vector2(0, GetComponent<BoxCollider2D>().bounds.size.y / 2);
+        lr = GetComponent<LineRenderer>();
     }
 
     void FixedUpdate()
@@ -104,23 +106,28 @@ public class Player : MonoBehaviour
             //Mouse is down for the first time (OnMouseDown)
             isDragging = true;
             Mouse.current.WarpCursorPosition(Camera.main.WorldToScreenPoint(transform.position));
-            startDragPos = transform.position;
             //currentThrowable = Instantiate(throwable, transform.position, transform.rotation);
         }
-        //if (Mouse.current.leftButton.isPressed && isDragging)
-        //{
+        if (Mouse.current.leftButton.isPressed && isDragging)
+        {
             //Called when mouse is dragging (OnMouseDrag)
-        //}
+            currentPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            List<Vector3> points = Plot(throwable.GetComponent<Rigidbody2D>(), transform.position, -((currentPos - transform.position) * 2), 500);
+            lr.positionCount = points.Count;
+            lr.SetPositions(points.ToArray());
+        }
         if (!Mouse.current.leftButton.isPressed && isDragging)
         {
             //Called when mouse is released (OnMouseUp)
             isDragging = false;
-            Vector2 dragEndPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            Vector2 velocity = (dragEndPos - startDragPos)*2;
+            currentPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            Vector2 velocity = (currentPos - transform.position)*2;
             currentThrowable = Instantiate(throwable, transform.position, transform.rotation);
             currentThrowable.GetComponent<Rigidbody2D>().velocity = -velocity;
             currentThrowable.GetComponent<ThrowableJumpPad>().setThrower(this);
             Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), currentThrowable.GetComponent<BoxCollider2D>(), true);
+            lr.positionCount = 0;
+            lr.SetPositions(new Vector3[0]);
         }
     }
 
@@ -184,5 +191,29 @@ public class Player : MonoBehaviour
     public void returnPad(GameObject pad)
     {
         Destroy(pad);
+    }
+
+    public List<Vector3> Plot(Rigidbody2D rigidbody, Vector2 pos, Vector2 velocity, int steps)
+    {
+        List<Vector3> results = new List<Vector3>();
+
+        float timestep = Time.fixedDeltaTime / Physics2D.velocityIterations;
+        Vector2 gravityAccel = Physics2D.gravity * rigidbody.gravityScale * timestep * timestep;
+        float drag = 1f - timestep * rigidbody.drag;
+        Vector2 moveStep = velocity * timestep;
+
+        while (true)
+        {
+            moveStep += gravityAccel;
+            moveStep *= drag;
+            pos += moveStep;
+            if (Physics2D.CircleCast(pos, .1f, Vector2.zero, 0, groundCheckLayerMask).collider != null)
+            {
+                break; //stops line before collision
+            }
+            results.Add(pos);
+        }
+
+        return results;
     }
 }
