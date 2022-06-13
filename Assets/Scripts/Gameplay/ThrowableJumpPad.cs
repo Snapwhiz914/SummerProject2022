@@ -21,8 +21,19 @@ public class ThrowableJumpPad : MonoBehaviour
         Debug.Log(distanceToMoveIfRotated);
     }
 
+    public bool isThisRotated()
+    {
+        return isRotated;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.CompareTag("BouncePad") && !hasLanded)
+        {
+            returnThisPadToPlayer();
+            return;
+        }
+
         if (!collision.gameObject.CompareTag("Player") && !hasLanded) //Landing
         {
             float angle = Vector2.Angle(collision.GetContact(0).normal, Vector2.up);
@@ -61,5 +72,10 @@ public class ThrowableJumpPad : MonoBehaviour
                 Debug.Log(new Vector2(collision.relativeVelocity.x, -collision.relativeVelocity.y));
             }
         }
+    }
+    
+    private void returnThisPadToPlayer()
+    {
+        thrower.returnPad(gameObject);
     }
 }

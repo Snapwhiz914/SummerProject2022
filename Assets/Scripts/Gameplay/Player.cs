@@ -130,7 +130,20 @@ public class Player : MonoBehaviour
         //Jump pad interaction
         if (collision.gameObject.CompareTag("BouncePad"))
         {
-            didLandOnBouncePad = true;
+            //if it is a 90 degree pad and the hit was 90 degrees, then a land event happened
+            if (collision.gameObject.GetComponent<ThrowableJumpPad>().isThisRotated()
+                && isApproximately(Vector2.Angle(collision.GetContact(0).normal, Vector2.up), 90, 0.01f))
+            {
+                didLandOnBouncePad = true;
+            }
+            else didLandOnBouncePad = false;
+            //Same as above but for flat pads
+            if (!collision.gameObject.GetComponent<ThrowableJumpPad>().isThisRotated()
+                && isApproximately(Vector2.Angle(collision.GetContact(0).normal, Vector2.up), 0, 0.01f))
+            {
+                didLandOnBouncePad = true;
+            }
+            else didLandOnBouncePad = false;
         } else
         {
             didLandOnBouncePad = false;
@@ -155,5 +168,15 @@ public class Player : MonoBehaviour
         }
         isDying = false;
         controlEnabled = true;
+    }
+
+    private bool isApproximately(float a, float b, float tolerance)
+    {
+        return (Mathf.Abs(a - b) < tolerance);
+    }
+
+    public void returnPad(GameObject pad)
+    {
+        Destroy(pad);
     }
 }
