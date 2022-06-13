@@ -62,7 +62,7 @@ public class ThrowableJumpPad : MonoBehaviour
             Rigidbody2D otherRB = collision.gameObject.GetComponent<Rigidbody2D>();
             if (isRotated) //90 degree version
             {
-                otherRB.velocity = new Vector2(-collision.relativeVelocity.x, collision.relativeVelocity.y);
+                otherRB.velocity = new Vector2(-collision.relativeVelocity.x, thrower.jumpForce);
                 Debug.Log(otherRB.velocity);
                 Debug.Log(new Vector2(-collision.relativeVelocity.x, collision.relativeVelocity.y));
             } else

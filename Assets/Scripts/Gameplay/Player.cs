@@ -27,6 +27,7 @@ public class Player : MonoBehaviour
     private bool spaceKeyDebounce;
     private bool isDying;
     private bool didLandOnBouncePad;
+    private bool didLandOnRotatedBouncePad;
 
     private bool isDragging = false;
     private Vector2 startDragPos;
@@ -45,11 +46,15 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         if (!controlEnabled) return;
-        if (Keyboard.current.dKey.isPressed && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.right, groundCheckDistance, groundCheckLayerMask).collider == null)
+        if (Keyboard.current.dKey.isPressed 
+            && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.right, groundCheckDistance, groundCheckLayerMask).collider == null
+            && !didLandOnRotatedBouncePad)
         {
             mainRB.velocity = new Vector2(speed * Time.deltaTime, mainRB.velocity.y);
         }
-        if (Keyboard.current.aKey.isPressed && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.left, groundCheckDistance, groundCheckLayerMask).collider == null)
+        if (Keyboard.current.aKey.isPressed
+            && Physics2D.Raycast(transform.position - sideCheckRCOffset, Vector2.left, groundCheckDistance, groundCheckLayerMask).collider == null
+            && !didLandOnRotatedBouncePad)
         {
             mainRB.velocity = new Vector2(-speed * Time.deltaTime, mainRB.velocity.y);
         }
@@ -134,19 +139,20 @@ public class Player : MonoBehaviour
             if (collision.gameObject.GetComponent<ThrowableJumpPad>().isThisRotated()
                 && isApproximately(Vector2.Angle(collision.GetContact(0).normal, Vector2.up), 90, 0.01f))
             {
-                didLandOnBouncePad = true;
+                didLandOnRotatedBouncePad = true;
+                didLandOnBouncePad = false;
             }
-            else didLandOnBouncePad = false;
             //Same as above but for flat pads
             if (!collision.gameObject.GetComponent<ThrowableJumpPad>().isThisRotated()
                 && isApproximately(Vector2.Angle(collision.GetContact(0).normal, Vector2.up), 0, 0.01f))
             {
                 didLandOnBouncePad = true;
+                didLandOnRotatedBouncePad = false;
             }
-            else didLandOnBouncePad = false;
         } else
         {
             didLandOnBouncePad = false;
+            didLandOnRotatedBouncePad = false;
         }
     }
 
