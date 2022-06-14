@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
     public bool doubleJumpEnabled;
     [Range(0f, Mathf.Infinity)]
     public float airControlFactor;
+    public float throwableSpeed;
 
     private Rigidbody2D mainRB;
     private float groundCheckDistance;
@@ -112,7 +113,7 @@ public class Player : MonoBehaviour
         {
             //Called when mouse is dragging (OnMouseDrag)
             currentPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            List<Vector3> points = Plot(throwable.GetComponent<Rigidbody2D>(), transform.position, -((currentPos - transform.position) * 2), 500);
+            List<Vector3> points = Plot(throwable.GetComponent<Rigidbody2D>(), transform.position, -((currentPos - transform.position) * throwableSpeed), 500);
             lr.positionCount = points.Count;
             lr.SetPositions(points.ToArray());
         }
@@ -121,7 +122,7 @@ public class Player : MonoBehaviour
             //Called when mouse is released (OnMouseUp)
             isDragging = false;
             currentPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            Vector2 velocity = (currentPos - transform.position)*2;
+            Vector2 velocity = (currentPos - transform.position)*throwableSpeed;
             currentThrowable = Instantiate(throwable, transform.position, transform.rotation);
             currentThrowable.GetComponent<Rigidbody2D>().velocity = -velocity;
             currentThrowable.GetComponent<ThrowableJumpPad>().setThrower(this);
