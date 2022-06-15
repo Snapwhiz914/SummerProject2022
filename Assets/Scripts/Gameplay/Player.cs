@@ -44,6 +44,7 @@ public class Player : MonoBehaviour
         groundCheckRCOffset = new Vector2(GetComponent<BoxCollider2D>().bounds.size.x / 2, 0);
         sideCheckRCOffset = new Vector2(0, GetComponent<BoxCollider2D>().bounds.size.y / 2);
         lr = GetComponent<LineRenderer>();
+        StartCoroutine(loadEffect());
     }
 
     void FixedUpdate()
@@ -181,6 +182,19 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(0.01f);
         }
         isDying = false;
+        controlEnabled = true;
+    }
+
+    private IEnumerator loadEffect()
+    {
+        controlEnabled = false;
+        transform.position = spawnPoint.transform.position;
+        deathPanel.color = new Color(0, 0, 0, 255);
+        for (int i = 100; i > 0; i--)
+        {
+            deathPanel.color = new Color(0, 0, 0, i * .01f);
+            yield return new WaitForSeconds(0.01f);
+        }
         controlEnabled = true;
     }
 
