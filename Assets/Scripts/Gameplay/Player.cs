@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
@@ -16,6 +17,10 @@ public class Player : MonoBehaviour
     [Range(0f, Mathf.Infinity)]
     public float airControlFactor;
     public float throwableSpeed;
+
+    public GameObject dialogObject;
+    public TMP_Text dialogText;
+    public GameObject pabtc;
 
     private Rigidbody2D mainRB;
     private float groundCheckDistance;
@@ -230,5 +235,32 @@ public class Player : MonoBehaviour
         }
 
         return results;
+    }
+
+    public IEnumerator sayDialog(string whatToSay, bool canMove, float speedBetweenLetters)
+    {
+        controlEnabled = canMove;
+        dialogObject.SetActive(true);
+        pabtc.SetActive(false) ;
+        foreach (char letter in whatToSay) {
+            dialogText.text = dialogText.text + letter;
+            yield return new WaitForSeconds(speedBetweenLetters);
+        }
+        controlEnabled = true;
+        pabtc.SetActive(!canMove);
+        if (!canMove)
+        {
+            yield return new WaitUntil(() =>
+            {
+                return Keyboard.current.anyKey.isPressed;
+            });
+        } else
+        {
+            yield return new WaitForSeconds(1.75f);
+        }
+        dialogObject.SetActive(false);
+        dialogText.text = "";
+        if (!canMove) yield return new WaitForSeconds(.1f);
+        controlEnabled = true;
     }
 }
